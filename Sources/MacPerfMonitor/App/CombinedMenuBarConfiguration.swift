@@ -74,7 +74,7 @@ final class CombinedMenuBarConfiguration: ObservableObject {
     static let presentationDefaultsKey = "combinedMenuBarPresentation"
     static let focusDefaultsKey = "combinedMenuBarFocus"
     static let stripGapDefaultsKey = "combinedMenuBarStripGap"
-    static let defaultStripGap: Double = 1.5
+    static let defaultStripGap: Double = 0
     static let stripGapRange: ClosedRange<Double> = 0...16
     private static let legacyCPUKey = "showCPUMenuBar"
     private static let legacyGPUKey = "showGPUMenuBar"
