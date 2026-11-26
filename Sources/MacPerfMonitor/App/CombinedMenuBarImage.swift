@@ -92,7 +92,7 @@ enum CombinedMenuBarReadouts {
 
 @MainActor
 enum CombinedMenuBarImage {
-    private static let stripSeparatorWidth: CGFloat = 1.5
+    static let defaultStripGap = CGFloat(CombinedMenuBarConfiguration.defaultStripGap)
     /// Shared menu-bar item height so Focus and Strip cells align.
     private static let itemHeight: CGFloat = 22
     /// Matched figure size for every two-line cell (caption+value and ↓/↑).
@@ -103,14 +103,15 @@ enum CombinedMenuBarImage {
     static var cachedLayoutCount: Int { layoutCache.count }
 
     static func image(
-        readouts: [CombinedMenuBarReadout], presentation: MenuBarPresentation
+        readouts: [CombinedMenuBarReadout], presentation: MenuBarPresentation,
+        gap: CGFloat = defaultStripGap
     ) -> NSImage {
         let image =
             switch presentation {
             case .focus:
                 readouts.first.map(focusImage(readout:)) ?? NSImage(size: .zero)
             case .strip:
-                stripImage(readouts: readouts)
+                stripImage(readouts: readouts, gap: gap)
             }
         // A status item is mirrored to every display. Template tinting lets each
         // menu bar choose its own contrasting color instead of sharing pixels
@@ -121,7 +122,7 @@ enum CombinedMenuBarImage {
 
     static func metric(
         at imageX: CGFloat, readouts: [CombinedMenuBarReadout],
-        presentation: MenuBarPresentation
+        presentation: MenuBarPresentation, gap: CGFloat = defaultStripGap
     ) -> MenuBarMetric? {
         guard let first = readouts.first else { return nil }
         guard presentation == .strip else { return first.metric }
@@ -132,9 +133,9 @@ enum CombinedMenuBarImage {
             let end = x + layouts[index].width
             if imageX <= end { return readouts[index].metric }
             if index < readouts.count - 1 {
-                let separatorEnd = end + stripSeparatorWidth
+                let separatorEnd = end + gap
                 if imageX < separatorEnd {
-                    return imageX - end < stripSeparatorWidth / 2
+                    return imageX - end < gap / 2
                         ? readouts[index].metric : readouts[index + 1].metric
                 }
                 x = separatorEnd
@@ -200,11 +201,11 @@ enum CombinedMenuBarImage {
         }
     }
 
-    private static func stripImage(readouts: [CombinedMenuBarReadout]) -> NSImage {
+    private static func stripImage(readouts: [CombinedMenuBarReadout], gap: CGFloat) -> NSImage {
         let layouts = readouts.map { layout(for: $0) }
         let contentWidth =
             layouts.reduce(0) { $0 + $1.width }
-            + stripSeparatorWidth * CGFloat(max(0, layouts.count - 1))
+            + gap * CGFloat(max(0, layouts.count - 1))
         let width = contentWidth
 
         return MenuBarReadoutImage.render(width: width, height: itemHeight) { size in
@@ -212,7 +213,7 @@ enum CombinedMenuBarImage {
             for (index, layout) in layouts.enumerated() {
                 layout.draw(at: x, height: size.height)
                 x += layout.width
-                if index < layouts.count - 1 { x += stripSeparatorWidth }
+                if index < layouts.count - 1 { x += gap }
             }
         }
     }

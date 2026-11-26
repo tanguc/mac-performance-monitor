@@ -169,13 +169,14 @@ final class CombinedStatusItemController: NSObject, NSPopoverDelegate {
         let readouts = CombinedMenuBarReadouts.current(for: metrics, model: model)
         let alarmCount = model.activeAlerts.count
         let signature =
-            "\(configuration.presentation.rawValue)|\(alarmCount)|"
+            "\(configuration.presentation.rawValue)|\(configuration.stripGap)|\(alarmCount)|"
             + readouts.map {
                 "\($0.metric.rawValue):\($0.value):\($0.secondaryValue ?? ""):\($0.isAlarm)"
             }.joined(separator: "|")
         guard signature != shownSignature else { return }
         button.image = CombinedMenuBarImage.image(
-            readouts: readouts, presentation: configuration.presentation)
+            readouts: readouts, presentation: configuration.presentation,
+            gap: CGFloat(configuration.stripGap))
         if shownAlarmCount != alarmCount {
             button.imagePosition = alarmCount > 0 ? .imageLeading : .imageOnly
             button.attributedTitle = alarmTitle(count: alarmCount)
@@ -300,17 +301,19 @@ final class CombinedStatusItemController: NSObject, NSPopoverDelegate {
             : (button.cell as? NSButtonCell)?.titleRect(forBounds: button.bounds)
         return Self.panel(
             at: local, imageRect: imageRect, alertRect: alertRect,
-            readouts: readouts, presentation: configuration.presentation)
+            readouts: readouts, presentation: configuration.presentation,
+            gap: CGFloat(configuration.stripGap))
     }
 
     static func panel(
         at point: NSPoint, imageRect: NSRect, alertRect: NSRect?,
-        readouts: [CombinedMenuBarReadout], presentation: MenuBarPresentation
+        readouts: [CombinedMenuBarReadout], presentation: MenuBarPresentation,
+        gap: CGFloat = CombinedMenuBarImage.defaultStripGap
     ) -> CombinedMenuBarPanel? {
         if let alertRect, alertRect.contains(point) { return .alerts }
         let imageX = min(max(point.x - imageRect.minX, 0), imageRect.width)
         return CombinedMenuBarImage.metric(
-            at: imageX, readouts: readouts, presentation: presentation
+            at: imageX, readouts: readouts, presentation: presentation, gap: gap
         ).map {
             .metric($0)
         }

@@ -251,6 +251,18 @@ private struct MenuBarDockSettingsView: View {
                             Label(metric.title, systemImage: metric.symbolName).tag(metric)
                         }
                     }
+                } else {
+                    LabeledContent("Spacing") {
+                        HStack {
+                            Slider(
+                                value: stripGapBinding,
+                                in: CombinedMenuBarConfiguration.stripGapRange, step: 0.5)
+                            Text(String(format: "%.1f pt", menuBar.stripGap))
+                                .monospacedDigit()
+                                .frame(width: 48, alignment: .trailing)
+                        }
+                    }
+                    .help("Space between read-outs in the Strip item.")
                 }
 
                 HStack {
@@ -306,6 +318,10 @@ private struct MenuBarDockSettingsView: View {
         Binding(get: { menuBar.presentation }, set: { menuBar.presentation = $0 })
     }
 
+    private var stripGapBinding: Binding<Double> {
+        Binding(get: { menuBar.stripGap }, set: { menuBar.stripGap = $0 })
+    }
+
     private var focusBinding: Binding<MenuBarMetric> {
         Binding(get: { menuBar.focusedMetric }, set: { menuBar.focusedMetric = $0 })
     }
@@ -351,7 +367,8 @@ private struct MenuBarDockSettingsView: View {
             ? [menuBar.focusedMetric] : menuBar.selectedMetrics
         let readouts = CombinedMenuBarReadouts.current(for: metrics, model: model)
         return CombinedMenuBarImage.image(
-            readouts: readouts, presentation: menuBar.presentation)
+            readouts: readouts, presentation: menuBar.presentation,
+            gap: CGFloat(menuBar.stripGap))
     }
 }
 

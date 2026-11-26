@@ -22,6 +22,24 @@ final class MenuBarRenderingTests: XCTestCase {
         ]
     }
 
+    func testStripGapWidensImageAndKeepsHitTargets() throws {
+        _ = NSApplication.shared
+        let narrow = CombinedMenuBarImage.image(readouts: readouts, presentation: .strip)
+        let wide = CombinedMenuBarImage.image(readouts: readouts, presentation: .strip, gap: 12)
+        XCTAssertEqual(
+            wide.size.width - narrow.size.width,
+            (12 - CombinedMenuBarImage.defaultStripGap) * CGFloat(readouts.count - 1),
+            accuracy: 0.01)
+        var hits: [MenuBarMetric] = []
+        for x in stride(from: 0.0, to: wide.size.width, by: 0.5) {
+            let metric = try XCTUnwrap(
+                CombinedMenuBarImage.metric(
+                    at: x, readouts: readouts, presentation: .strip, gap: 12))
+            if metric != hits.last { hits.append(metric) }
+        }
+        XCTAssertEqual(hits, readouts.map(\.metric))
+    }
+
     func testTemplateImagesAndStripHitTargets() throws {
         _ = NSApplication.shared
         let strip = CombinedMenuBarImage.image(readouts: readouts, presentation: .strip)

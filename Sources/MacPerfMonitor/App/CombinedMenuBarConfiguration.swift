@@ -73,6 +73,9 @@ final class CombinedMenuBarConfiguration: ObservableObject {
     static let selectionDefaultsKey = "combinedMenuBarMetrics"
     static let presentationDefaultsKey = "combinedMenuBarPresentation"
     static let focusDefaultsKey = "combinedMenuBarFocus"
+    static let stripGapDefaultsKey = "combinedMenuBarStripGap"
+    static let defaultStripGap: Double = 1.5
+    static let stripGapRange: ClosedRange<Double> = 0...16
     private static let legacyCPUKey = "showCPUMenuBar"
     private static let legacyGPUKey = "showGPUMenuBar"
     private static let legacyEnergyKey = "showBatteryMenuBar"
@@ -84,6 +87,10 @@ final class CombinedMenuBarConfiguration: ObservableObject {
     }
     @Published var focusedMetric: MenuBarMetric {
         didSet { defaults.set(focusedMetric.rawValue, forKey: Self.focusDefaultsKey) }
+    }
+    /// points between read-outs in Strip
+    @Published var stripGap: Double {
+        didSet { defaults.set(stripGap, forKey: Self.stripGapDefaultsKey) }
     }
 
     private let defaults: UserDefaults
@@ -101,6 +108,10 @@ final class CombinedMenuBarConfiguration: ObservableObject {
         focusedMetric =
             savedFocus.flatMap { loadedMetrics.contains($0) ? $0 : nil }
             ?? loadedMetrics.first ?? .pressure
+        let savedGap = defaults.object(forKey: Self.stripGapDefaultsKey) as? Double
+        stripGap = min(
+            max(savedGap ?? Self.defaultStripGap, Self.stripGapRange.lowerBound),
+            Self.stripGapRange.upperBound)
         persistSelection()
     }
 
