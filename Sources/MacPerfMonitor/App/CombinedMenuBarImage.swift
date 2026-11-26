@@ -256,7 +256,7 @@ enum CombinedMenuBarImage {
             let topSize = top.size()
             let bottomSize = bottom.size()
             let figuresWidth = ceil(max(topSize.width, bottomSize.width, sample.size().width))
-            let gap: CGFloat = 5
+            let gap: CGFloat = 2
             let width = labelWidth + gap + figuresWidth + 1
             return CellLayout(width: width) { x, height in
                 drawSymbol(
@@ -281,13 +281,13 @@ enum CombinedMenuBarImage {
             readout.value.hasSuffix("%") ? String(readout.value.dropLast()) : readout.value
         let value = attributed(compactValue, font: font, color: color)
         // Width-stability sample per unit family, so a cell never jitters as
-        // digits change: percent readouts size against "100", temperature
-        // against "100°", wattage against "199W", free space against "999G".
+        // digits change. fork: two digits for percent/temperature, a real 100
+        // widens the cell for that tick only
         let sampleText =
             readout.value.hasSuffix("%")
-            ? "100"
+            ? "99"
             : readout.value.hasSuffix("°")
-                ? "100°" : readout.metric == .freeSpace ? "999G" : "199W"
+                ? "99°" : readout.metric == .freeSpace ? "999G" : "199W"
         let sample = attributed(sampleText, font: font, color: color)
         let labelSize = label.size()
         let valueSize = value.size()
