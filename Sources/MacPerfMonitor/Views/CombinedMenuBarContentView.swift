@@ -292,12 +292,14 @@ struct CombinedMenuBarContentView: View {
                     dismiss()
                     showStandardAboutPanel()
                 }
-                Button(updateController.menuTitle, systemImage: updateController.menuSymbol) {
-                    dismiss()
-                    NSApp.activate(ignoringOtherApps: true)
-                    updateController.checkForUpdates()
+                if UpdateController.isEnabled {
+                    Button(updateController.menuTitle, systemImage: updateController.menuSymbol) {
+                        dismiss()
+                        NSApp.activate(ignoringOtherApps: true)
+                        updateController.checkForUpdates()
+                    }
+                    .disabled(!updateController.canCheckForUpdates)
                 }
-                .disabled(!updateController.canCheckForUpdates)
                 Divider()
                 Button("Quit \(AppInfo.displayName)", systemImage: "power") {
                     NSApp.terminate(nil)

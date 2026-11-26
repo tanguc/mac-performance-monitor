@@ -60,6 +60,8 @@ final class ProcessGlossaryStore: ObservableObject {
     }
 
     func refresh() async {
+        // fork: keep the bundled/cached copy, never fetch from upstream
+        guard UpdateController.isEnabled else { return }
         if let inFlight {
             await inFlight.value
             return

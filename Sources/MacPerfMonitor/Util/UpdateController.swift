@@ -84,6 +84,9 @@ final class UpdateController: NSObject, ObservableObject, SPUUpdaterDelegate,
         subsystem: Bundle.main.bundleIdentifier ?? "uk.co.bzwrd.macperfmonitor",
         category: "update")
 
+    /// fork: local ad-hoc builds never contact upstream (appcast, catalogs, star prompt)
+    static let isEnabled = false
+
     override init() {
         super.init()
         // startingUpdater: true starts the updater immediately, which begins the
@@ -91,7 +94,7 @@ final class UpdateController: NSObject, ObservableObject, SPUUpdaterDelegate,
         // for the pre-install hook and quiet installs, the user-driver one for
         // gentle reminders.
         controller = SPUStandardUpdaterController(
-            startingUpdater: true, updaterDelegate: self, userDriverDelegate: self)
+            startingUpdater: Self.isEnabled, updaterDelegate: self, userDriverDelegate: self)
 
         // Mirror Sparkle's own state into published properties so SwiftUI can
         // follow it (all KVO-observable on the updater).
@@ -112,6 +115,7 @@ final class UpdateController: NSObject, ObservableObject, SPUUpdaterDelegate,
     /// A user-initiated check: always shows UI, including an up-to-date result.
     /// With a gentle reminder pending, this brings that update into focus.
     func checkForUpdates() {
+        guard Self.isEnabled else { return }
         controller.updater.checkForUpdates()
     }
 

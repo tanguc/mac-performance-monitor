@@ -69,26 +69,28 @@ private struct GeneralSettingsView: View {
                 Text("Startup")
             }
 
-            Section {
-                Toggle(
-                    "Check for updates automatically",
-                    isOn: Binding(
-                        get: { updateController.automaticallyChecks },
-                        set: { updateController.setAutomaticallyChecks($0) }))
-                Toggle(
-                    "Install updates automatically",
-                    isOn: Binding(
-                        get: { updateController.automaticallyInstalls },
-                        set: { updateController.setAutomaticallyInstalls($0) })
-                )
-                .disabled(
-                    !updateController.automaticallyChecks
-                        || !updateController.allowsAutomaticInstall)
-                caption(
-                    "New versions never open a window on their own. When one is found, Update appears in the menu bar panel. With automatic install on, it downloads in the background and installs the next time no \(AppInfo.displayName) window is open."
-                )
-            } header: {
-                Text("Updates")
+            if UpdateController.isEnabled {
+                Section {
+                    Toggle(
+                        "Check for updates automatically",
+                        isOn: Binding(
+                            get: { updateController.automaticallyChecks },
+                            set: { updateController.setAutomaticallyChecks($0) }))
+                    Toggle(
+                        "Install updates automatically",
+                        isOn: Binding(
+                            get: { updateController.automaticallyInstalls },
+                            set: { updateController.setAutomaticallyInstalls($0) })
+                    )
+                    .disabled(
+                        !updateController.automaticallyChecks
+                            || !updateController.allowsAutomaticInstall)
+                    caption(
+                        "New versions never open a window on their own. When one is found, Update appears in the menu bar panel. With automatic install on, it downloads in the background and installs the next time no \(AppInfo.displayName) window is open."
+                    )
+                } header: {
+                    Text("Updates")
+                }
             }
 
             Section {

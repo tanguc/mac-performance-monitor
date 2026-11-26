@@ -827,6 +827,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate,
     }
 
     private func considerGitHubStarPrompt() {
+        // fork: no star nag
+        guard UpdateController.isEnabled else { return }
         DispatchQueue.main.async { [weak self] in
             guard let self, self.onboarding.hasCompletedSetup,
                 NSApp.isActive, let window = NSApp.keyWindow,

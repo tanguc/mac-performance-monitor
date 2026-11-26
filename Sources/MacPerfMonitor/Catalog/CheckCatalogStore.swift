@@ -38,6 +38,8 @@ final class CheckCatalogStore: ObservableObject {
     /// onto one fetch (so the launch refresh and a deep dive opened right after share
     /// the same network round-trip). Never downgrades on failure.
     func refresh() async {
+        // fork: keep the bundled/cached copy, never fetch from upstream
+        guard UpdateController.isEnabled else { return }
         if let inFlight {
             await inFlight.value
             return
